@@ -1,0 +1,75 @@
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+int soundSensorPin = A0;
+int led1 = 2;
+int led2 = 3;
+int led3 = 4;
+int threshold = 100;
+int buzzer = 5 ;
+int clapCount = 0;
+boolean clapped = false;
+
+void setup() {
+  lcd.init();
+  lcd.backlight();
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
+  pinMode (buzzer, INPUT);
+  pinMode(soundSensorPin, INPUT);
+  lcd.print("Clap Count:");
+
+}
+
+void loop() {
+  int sensorValue = analogRead(soundSensorPin);
+
+  if (sensorValue > threshold && !clapped) {
+    clapped = true;
+    clapCount++;
+    clapAction(clapCount);
+    updateLCD(clapCount);
+  } else if (sensorValue < threshold) {
+    clapped = false;
+  }
+}
+void updateLCD(int count) {
+  lcd.setCursor(0, 1);
+  lcd.print("     ");
+  lcd.setCursor(0, 1);
+  lcd.print(count);
+} 
+
+void clapAction(int count) {
+  if (count == 1) {
+
+    digitalWrite(led1, HIGH);
+     digitalWrite(led2, LOW);
+    digitalWrite(led3, LOW);
+    noTone (buzzer );
+   
+
+  } else if (count == 2) {
+    digitalWrite(led1, LOW);
+    digitalWrite(led2, HIGH);
+    digitalWrite(led3, HIGH);
+    noTone (buzzer);
+    
+
+  } else if (count == 3) {
+    digitalWrite(led3, HIGH);
+    digitalWrite(led2, HIGH);
+    digitalWrite(led1, HIGH);
+    noTone (buzzer );
+   
+  } else {
+    clapCount = 0;
+    digitalWrite(led1, LOW);
+    digitalWrite(led2, LOW);
+    digitalWrite(led3, LOW);
+    tone (5 , HIGH);
+  }
+ 
+}
